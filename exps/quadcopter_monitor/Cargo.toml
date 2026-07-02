@@ -1,0 +1,10 @@
+[package]
+name = "quadcopter_monitor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rtreach = { path = "../../rtreach" }
+quadcopter = { path = "../../quadcopter" }
+csv = "1.3.0"
+lazy_static = "1.5.0"
