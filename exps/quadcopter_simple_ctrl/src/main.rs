@@ -17,13 +17,23 @@ const SUBGOAL_FILE_PATH: &str = "data/quadcopter/simple_ctrl/subgoals.csv";
 const REACHTUBE_FILE_PATH: &str = "data/quadcopter/simple_ctrl/reachtubes.csv";
 const OBSTACLE_SPEED: f64 = 0.5; // m/s
 fn main() -> TractResult<()> {
+    // local/overnight-fixes: optional CLI arg <mode: ["wo", "rrrlc"]> (default "rrrlc")
+    // reproduces the README quad_wo (collision) vs quad_rustreach_rlc (safe) videos
+    // with an initial disturbance of +1 m/s in the +y direction.
+    let args: Vec<String> = env::args().collect();
+    let mode: String = if args.len() > 1 { args[1].clone() } else { "rrrlc".to_string() };
+    if mode != "wo" && mode != "rrrlc" {
+        eprintln!("Usage: {} <mode: [\"wo\", \"rrrlc\"]>", args[0]);
+        std::process::exit(1);
+    }
     let save_data = true;
     // Get the current working directory
     let current_dir = env::current_dir().expect("Failed to get current directory");
 
-    let states_file_path = current_dir.join(STATES_FILE_PATH);
-    let subgoal_file_path = current_dir.join(SUBGOAL_FILE_PATH);
-    let reachtube_file_path = current_dir.join(REACHTUBE_FILE_PATH);
+    let states_file_path = current_dir.join(format!("data/quadcopter/simple_ctrl/{}_ctrl_states.csv", mode));
+    let subgoal_file_path = current_dir.join(format!("data/quadcopter/simple_ctrl/{}_subgoals.csv", mode));
+    let reachtube_file_path = current_dir.join(format!("data/quadcopter/simple_ctrl/{}_reachtubes.csv", mode));
+    let _ = (STATES_FILE_PATH, SUBGOAL_FILE_PATH, REACHTUBE_FILE_PATH);
     if save_data{
         if let Some(parent) = states_file_path.parent() {
             println!("Saving data to: {:?}", parent);
@@ -52,8 +62,9 @@ fn main() -> TractResult<()> {
     }
 
     // Start & Goal States
-    let start_state = [0.0; NUM_DIMS];
-    // start_state[7] = 0.6; // v_y
+    let mut start_state = [0.0; NUM_DIMS];
+    // v_y initial disturbance (README videos use +1 m/s in +y); optional 2nd CLI arg
+    start_state[7] = if args.len() > 2 { args[2].parse().unwrap_or(1.0) } else { 1.0 };
     let goal_list = [[4., 0., 0.]];
     let mut goal_idx = 0;
 
@@ -82,9 +93,9 @@ fn main() -> TractResult<()> {
 
     // Control Parameters
     let learning_enabled = true;
-    let use_subgoal_ctrl = false;
-    let use_rtreach = false;
-    let use_rtreach_dynamic_control = false;
+    let use_subgoal_ctrl = mode == "rrrlc";
+    let use_rtreach = mode == "rrrlc";
+    let use_rtreach_dynamic_control = mode == "rrrlc";
     let pi_low = model_sample_action;
     let sim_time = 2.0;
     let wall_time_ms = 100;
