@@ -1,0 +1,17 @@
+[package]
+name = "quad_reach_monitor_py"
+version = "0.1.0"
+edition = "2021"
+
+# Standalone (NOT a member of the rustreach workspace): maturin builds this
+# crate inside the ansr_vandy:rust container against the container's
+# Python 3.10, following the ebt/rust_thetastar pattern.
+[workspace]
+
+[lib]
+name = "quad_reach_monitor"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.22", features = ["extension-module"] }
+quadcopter_monitor = { path = "../quadcopter_monitor" }

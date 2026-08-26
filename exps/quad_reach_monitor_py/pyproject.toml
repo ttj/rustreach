@@ -1,0 +1,12 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "quad_reach_monitor"
+version = "0.1.0"
+description = "RusTReach anytime reach-set runtime monitor for the ANSR quadcopter (city elevation grid check)"
+requires-python = ">=3.10"
+
+[tool.maturin]
+bindings = "pyo3"

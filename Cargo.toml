@@ -11,7 +11,8 @@ members = [
     "exps/quadcopter_corr_exp", 
     "exps/bicycle_nbd_exp", 
     "exps/quadcopter_nbd_exp", 
-    "exps/rrt_path_generation", 
+    "exps/rrt_path_generation",
+    "exps/quadcopter_monitor",
 ]
 resolver = "2"
 
